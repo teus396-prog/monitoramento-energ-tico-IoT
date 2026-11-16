@@ -1,0 +1,6 @@
+{
+  "dispositivo_id": "ESP32_QUADRO_01",
+  "corrente_rms": 11.8,
+  "potencia_ativa": 1500.0,
+  "consumo_kwh": 0.05
+}

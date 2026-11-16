@@ -1,0 +1,27 @@
+import time
+import requests
+
+try:
+    import serial  # type: ignore[import-not-found]
+except ModuleNotFoundError:
+    serial = None
+
+PORTA_COM = "COM3"
+VELOCIDADE = 115200
+URL_API_LOCAL = "http://localhost:8000/api/medicoes"
+if serial is None:
+    raise RuntimeError("Biblioteca pyserial não está instalada. Execute: pip install pyserial")
+
+print(f"🔌 Conectando ao ESP32 na porta {PORTA_COM}...")
+ser = serial.Serial(PORTA_COM, VELOCIDADE, timeout=1)
+time.sleep(2)
+
+while True:
+    if ser.in_waiting > 0:
+        linha = ser.readline().decode("utf-8", errors="ignore").strip()
+        if linha.startswith("{") and linha.endswith("}"):
+            try:
+                resposta = requests.post(URL_API_LOCAL, data=linha, headers={"Content-Type": "application/json"})
+                print(f"✅ Recebido do ESP32 e gravado! Status: {resposta.status_code}")
+            except Exception as e:
+                print(f"❌ Erro ao enviar para API local: {e}")
